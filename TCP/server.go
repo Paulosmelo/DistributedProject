@@ -8,10 +8,10 @@ import (
 )
 
 func main() {
-	HelloServerTCP()
+	ServerTCP()
 }
 
-func HelloServerTCP() {
+func ServerTCP() {
 	r, err := net.ResolveTCPAddr("tcp", "localhost:1313")
 	if err != nil {fmt.Printf(err.Error())}
 
@@ -44,7 +44,7 @@ func HandleTCPConnection(conn net.Conn){
 		}
 	}(conn)
 	
-	r := vendas.Vendas{}.GetVendas(string(buffer[:mLen]))	
-	fmt.Println("Vendas at day", string(buffer[:mLen]), "was", r)
+	r := vendas.VendasTCP{}.GetVendasTCP(buffer[:mLen])	
+	fmt.Println(r)
 }
 

@@ -1,18 +1,26 @@
 package vendas
 
 import (
-	"strconv"
-	"fmt"
+	"sync"
 )
 
 type VendasRPC struct{}
 
-var arrayRPC  =  [20]int{1,2,231,3,1213,42,54,509,2101,201,391,30,102,1021,281,21,3,13,312,312}
+var (
+	wgRPC = sync.WaitGroup{}// guards
+	arrayRPC  = [20]int{0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0}
+)
 
 
-func (t *VendasRPC) GetVendasRPC(n string, reply *string) error{
-	i, err := strconv.Atoi(n)
-	if err != nil {fmt.Printf("Error converting message.\n")}
-	*reply =  strconv.Itoa(arrayRPC[i])
+func (t *VendasRPC) GetVendasRPC(n int, reply *[20]int) error {
+	wgRPC.Add(1)
+	go AddVendaRPC(n)
+	wgRPC.Wait()
+	*reply =  arrayRPC
 	return nil
+}
+
+func AddVendaRPC (n int) {
+	defer wgRPC.Done()
+	arrayRPC[n] = arrayRPC[n] + 1
 }

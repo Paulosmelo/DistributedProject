@@ -10,7 +10,7 @@ import (
 
 func server(){
 
-	vendas := new(vendas.VendasMOM)
+	vendas := new(vendas.VendasRPC)
 
 	// cria um novo server RPC
 	server := rpc.NewServer()

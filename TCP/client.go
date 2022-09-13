@@ -4,8 +4,7 @@ import (
 	"fmt"
 	"net"
 	"time"
-   //"math/rand"
-	//"strconv"
+   "math/rand"
 )
 
 
@@ -22,12 +21,12 @@ func clientTCP() {
 	// loop
 	for i := 0; i < SAMPLE_SIZE; i++ {
 
-		//rand.Seed(time.Now().UnixNano())
-	//	var random = strconv.Itoa(rand.Intn(20))
+		rand.Seed(time.Now().UnixNano())
+		var random = rand.Intn(20)
 		// prepara request & start time
 		t1 := time.Now()
 			
-		_, err = conn.Write([]byte("5"))
+		_, err = conn.Write([]byte(random))
 
 		times[i] = time.Now().Sub(t1)
 	}

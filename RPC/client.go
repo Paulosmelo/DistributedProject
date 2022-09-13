@@ -1,18 +1,17 @@
 package main
 
 import (
-	//"strconv"
 	"fmt"
 	"log"
 	"net/rpc"
 	"time"
-	//"math/rand"
+	"math/rand"
 )
 
 func client() {
-	var reply string
-	times := [1] time.Duration{}
-	var SAMPLE_SIZE = 1
+	var reply [20]int
+	times := [10] time.Duration{}
+	var SAMPLE_SIZE = 10
 
 	// conecta ao servidor
 	client, err := rpc.Dial("tcp", "localhost:1313")
@@ -25,17 +24,17 @@ func client() {
 	// loop
 	for i := 0; i < SAMPLE_SIZE; i++ {
 
-		//rand.Seed(time.Now().UnixNano())
-		//var random = strconv.Itoa(rand.Intn(20))
+		rand.Seed(time.Now().UnixNano())
+		var random = rand.Intn(20)
 		// prepara request & start time
 		t1 := time.Now()
 	
 		// invoca operação remota
-		client.Call("Sales.GetVendasRPC", "5", &reply)
+		client.Call("Sales.GetVendasRPC", random, &reply)
 		// stop time
 		times[i] = time.Now().Sub(t1)
-		//fmt.Println("Vendas for day", random, "is", reply)
-
+		fmt.Println("Adding venda to day:", random)
+		fmt.Println(reply)
 	}
 	totalTime := time.Duration(0)
 	for i := range times {
