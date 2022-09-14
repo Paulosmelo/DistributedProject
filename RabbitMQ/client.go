@@ -1,52 +1,67 @@
 package main
 
 import (
-	"fmt"
-	"log"
-	"net/rpc"
 	"time"
-	"math/rand"
+    "strconv"
+    "math/rand"
+	"fmt"
+	"encoding/json"
+	"github.com/streadway/amqp"
 )
 
-func client() {
-	var reply [20]int
-	times := [50] time.Duration{}
-	var SAMPLE_SIZE = 50
+func main() {
+	// conecta ao servidor de mensageria
+	conn, err := amqp.Dial("amqp://guest:guest@localhost:5672/")
+	if err != nil {fmt.Printf(err.Error())}
+	defer conn.Close()
 
-	// conecta ao servidor
-	client, err := rpc.Dial("tcp", "localhost:1313")
-	if err != nil {
-		log.Fatal(err)
-	}
+	// cria o canal
+	ch, err := conn.Channel()
+	if err != nil {fmt.Printf(err.Error())}
+	defer ch.Close()
 
-	defer client.Close()
+	// declara as filas
+	requestQueue, err := ch.QueueDeclare(
+		"request", false, false, false, false, nil)
+	if err != nil {fmt.Printf(err.Error())}
 
-	// loop
-	for i := 0; i < SAMPLE_SIZE; i++ {
+	replyQueue, err := ch.QueueDeclare(
+		"response", false, false, false, false, nil)
+	if err != nil {fmt.Printf(err.Error())}
 
+	// cria consumidor
+	msgsFromServer, err := ch.Consume(replyQueue.Name, "", true, false,
+		false, false, nil)
+	if err != nil {fmt.Printf(err.Error())}
+
+	start := time.Now()
+	for i := 0; i< 10; i++{
+
+		t1 := time.Now()
+
+		// prepara request
 		rand.Seed(time.Now().UnixNano())
 		var random = rand.Intn(20)
-		// prepara request & start time
-		t1 := time.Now()
-	
-		// invoca operação remota
-		client.Call("Sales.GetVendasMOM", random, &reply)
-		// stop time
-		times[i] = time.Now().Sub(t1)
-		fmt.Println("Adding venda to day:", random)
-		fmt.Println(reply)
+		
+		msgRequestBytes := []byte(strconv.Itoa(random))
+		if err != nil {fmt.Printf(err.Error())}
 
+		// publica request
+		err = ch.Publish("", requestQueue.Name, false, false,
+			amqp.Publishing{ContentType: "text/plain", Body: msgRequestBytes})
+		if err != nil {fmt.Printf(err.Error())}
+
+		// Receive message
+		x := <- msgsFromServer
+
+		var feedback [20]int
+		json.Unmarshal(x.Body, &feedback)
+		fmt.Println(feedback)
+		t2 := time.Now()
+		
+		y := float64(t2.Sub(t1).Nanoseconds()) / 1000000
+		fmt.Println(y)
 	}
-	totalTime := time.Duration(0)
-	for i := range times {
-		totalTime += times[i]
-	}
-	fmt.Printf("Total Duration: %v [%v]", totalTime, SAMPLE_SIZE)
-}
-
-func main() {
-
-	go client()
-
-	fmt.Scanln()
+	elapsed := time.Since(start)
+	fmt.Printf("Tempo: %s \n", elapsed)
 }
