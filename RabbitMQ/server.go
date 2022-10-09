@@ -3,7 +3,7 @@ package main
 import (
 	"encoding/json"
 	"fmt"
-    "strconv"
+    	"strconv"
 	"distributed_project/vendas"
 	"github.com/streadway/amqp"
 )

@@ -7,13 +7,13 @@ import (
     "strconv"
 	"os"
 	"encoding/json"
-    "math/rand"
+    //"math/rand"
 )
 
 
 func clientTCP() {
-	times := [10] time.Duration{}
-	var SAMPLE_SIZE = 10
+	times := [1000] time.Duration{}
+	var SAMPLE_SIZE = 1000
 
 	r, err := net.ResolveTCPAddr("tcp", "localhost:1313")
 	if err != nil {
@@ -38,14 +38,13 @@ func clientTCP() {
 	// loop
 	for i := 0; i < SAMPLE_SIZE; i++ {
 
-		rand.Seed(time.Now().UnixNano())
-		var random = rand.Intn(20)
+		// rand.Seed(time.Now().UnixNano())
+		// var random = rand.Intn(20)
 		
 		// prepara request & start time
 		t1 := time.Now()
-		fmt.Println(random)
 
-		_, err = conn.Write([]byte(strconv.Itoa(random)))
+		_, err = conn.Write([]byte(strconv.Itoa(1)))
 		if err != nil {
 			fmt.Println(err)
 			os.Exit(0)

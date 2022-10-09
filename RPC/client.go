@@ -5,14 +5,14 @@ import (
 	"log"
 	"net/rpc"
 	"time"
-	"math/rand"
+	// "math/rand"
 )
 
 func client() {
 	var reply [20]int
-	times := [10] time.Duration{}
-	var SAMPLE_SIZE = 10
+	times := [1000] time.Duration{}
 
+	var SAMPLE_SIZE = 1000
 	// conecta ao servidor
 	client, err := rpc.Dial("tcp", "localhost:1313")
 	if err != nil {
@@ -24,23 +24,25 @@ func client() {
 	// loop
 	for i := 0; i < SAMPLE_SIZE; i++ {
 
-		rand.Seed(time.Now().UnixNano())
-		var random = rand.Intn(20)
+		// rand.Seed(time.Now().UnixNano())
+		// var random = rand.Intn(20)
 		// prepara request & start time
 		t1 := time.Now()
 	
 		// invoca operação remota
-		client.Call("Sales.GetVendasRPC", random, &reply)
+		client.Call("Sales.GetVendasRPC", 1, &reply)
+		
+		fmt.Println(reply)
+
 		// stop time
 		times[i] = time.Now().Sub(t1)
-		fmt.Println("Adding venda to day:", random)
-		fmt.Println(reply)
+
 	}
 	totalTime := time.Duration(0)
 	for i := range times {
 		totalTime += times[i]
 	}
-	fmt.Printf("Total Duration: %v [%v]", totalTime, SAMPLE_SIZE)
+	fmt.Printf("Media Duration: %v [%v]", totalTime, SAMPLE_SIZE)
 }
 
 func main() {

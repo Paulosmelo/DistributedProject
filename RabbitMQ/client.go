@@ -3,7 +3,7 @@ package main
 import (
 	"time"
     "strconv"
-    "math/rand"
+   	 "math/rand"
 	"fmt"
 	"encoding/json"
 	"github.com/streadway/amqp"
@@ -35,14 +35,15 @@ func main() {
 	if err != nil {fmt.Printf(err.Error())}
 
 	start := time.Now()
-	for i := 0; i< 10; i++{
+	var SAMPLE_SIZE = 100
+	for i := 0; i< SAMPLE_SIZE; i++{
 
 		t1 := time.Now()
 
 		// prepara request
 		rand.Seed(time.Now().UnixNano())
 		var random = rand.Intn(20)
-		
+
 		msgRequestBytes := []byte(strconv.Itoa(random))
 		if err != nil {fmt.Printf(err.Error())}
 
